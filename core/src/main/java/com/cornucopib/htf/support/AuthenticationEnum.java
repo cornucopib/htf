@@ -1,4 +1,4 @@
-package com.cornucopib.htf;
+package com.cornucopib.htf.support;
 
 /**
  * 验证方式枚举.

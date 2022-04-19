@@ -1,10 +1,10 @@
-package com.cornucopib.htf;
+package com.cornucopib.htf.core;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
+import javax.annotation.Resource;
 
 /**
  * http终结者.
@@ -14,24 +14,12 @@ import java.net.URI;
  */
 public class Htf<T> {
 
-    private URI uri;
-    private String url;
-    private HttpHeaders HttpHeaders;
-    private AuthenticationEnum authenticationEnum;
-    private Object body;
-    private MultiValueMap<String, String> bodyMap;
-    private HttpMethod method;
-    private Class<T> responseType;
+    @Resource
+    private RestTemplate restTemplate;
 
-
-    public static class RequestEntityBuilder{
-
-
-
-
-
+    public ResponseEntity<T> execute(RequestEntity requestEntity, Class<T> responseType) {
+        return  this.restTemplate.exchange(requestEntity,responseType);
     }
-
 
 
 }

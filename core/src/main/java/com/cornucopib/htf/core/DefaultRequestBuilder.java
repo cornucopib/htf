@@ -1,14 +1,14 @@
 package com.cornucopib.htf.core;
 
-import com.cornucopib.htf.support.AuthenticationEnum;
-import com.cornucopib.htf.support.AuthenticationStrategy;
-import com.cornucopib.htf.support.CookieAuthenticationStrategy;
-import com.cornucopib.htf.support.SoaAuthenticationStrategy;
+import com.cornucopib.htf.support.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -16,32 +16,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 默认的请求构建.
+ *
  * @author cornucopib
  * @since 2022/4/17
  */
 public class DefaultRequestBuilder implements RequestBuilder {
 
-    private RequestHolder requestHolder;
+    private Request requestHolder;
+    private RequestEntity requestEntity;
 
 
     public DefaultRequestBuilder(HttpMethod method, URI uri) {
-        requestHolder = new RequestHolder(method, uri);
+        requestHolder = new Request(method, uri);
     }
 
     public DefaultRequestBuilder(HttpMethod method, String url) {
-        requestHolder = new RequestHolder(method, wrapURI(url, null, null));
+        requestHolder = new Request(method, wrapURI(url, null, null));
     }
 
     public DefaultRequestBuilder(HttpMethod method, String url, Map<String, String> queryParams, Object[] paths) {
-        requestHolder = new RequestHolder(method, wrapURI(url, queryParams, paths));
+        requestHolder = new Request(method, wrapURI(url, queryParams, paths));
     }
 
     public DefaultRequestBuilder(HttpMethod method, String url, Map<String, String> queryParams) {
-        requestHolder = new RequestHolder(method, wrapURI(url, queryParams, null));
+        requestHolder = new Request(method, wrapURI(url, queryParams, null));
     }
 
     public DefaultRequestBuilder(HttpMethod method, String url, Object[] paths) {
-        requestHolder = new RequestHolder(method, wrapURI(url, null, paths));
+        requestHolder = new Request(method, wrapURI(url, null, paths));
     }
 
     private URI wrapURI(String url, Map<String, String> queryParams, Object[] paths) {
@@ -87,12 +90,7 @@ public class DefaultRequestBuilder implements RequestBuilder {
 
     @Override
     public RequestBuilder authentication(AuthenticationEnum authenticationEnum) {
-        if (AuthenticationEnum.COOKIE == authenticationEnum) {
-            return authentication(new CookieAuthenticationStrategy());
-        } else if (AuthenticationEnum.SOA == authenticationEnum) {
-            return authentication(new SoaAuthenticationStrategy());
-        }
-        return this;
+        return authentication(AuthenticationFactory.getStrategy(authenticationEnum));
     }
 
 
@@ -103,7 +101,7 @@ public class DefaultRequestBuilder implements RequestBuilder {
         return this;
     }
 
-    private void mergeHeaders(RequestHolder requestHolder, Map<String, String> headers) {
+    private void mergeHeaders(Request requestHolder, Map<String, String> headers) {
         Map<String, String> sourceHeaders = requestHolder.getHttpHeaders();
         if (sourceHeaders != null) {
             Map<String, String> targetHeaders = new HashMap<>();
@@ -146,15 +144,30 @@ public class DefaultRequestBuilder implements RequestBuilder {
 
 
     @Override
-    public RequestEntity build() {
+    public RequestBuilder build() {
+        RequestEntity requestEntity;
         HttpMethod method = this.requestHolder.getMethod();
         if (HttpMethod.GET == method) {
-            return RequestEntity.method(this.requestHolder.getMethod(), this.requestHolder.getUri())
+            requestEntity = RequestEntity.method(this.requestHolder.getMethod(), this.requestHolder.getUri())
                     .headers(mapToHttpHeaders(this.requestHolder.getHttpHeaders()))
                     .build();
         }
-        return RequestEntity.method(this.requestHolder.getMethod(), this.requestHolder.getUri())
+        requestEntity = RequestEntity.method(this.requestHolder.getMethod(), this.requestHolder.getUri())
                 .headers(mapToHttpHeaders(this.requestHolder.getHttpHeaders()))
                 .body(this.requestHolder.getBody());
+        return this;
     }
+
+    @Override
+    public <T> ResponseEntity<T> send(Class<T> responseType) {
+        RestTemplate restTemplate = RestTemplateHolder.INSTANCE.getRestTemplate();
+        ResponseEntity<T> responseEntity = null;
+        try {
+            responseEntity = restTemplate.exchange(this.requestEntity, responseType);
+        } catch (RestClientException restClientException) {
+            restClientException.printStackTrace();
+        }
+        return responseEntity;
+    }
+
 }

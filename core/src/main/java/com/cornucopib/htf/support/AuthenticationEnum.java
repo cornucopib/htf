@@ -7,9 +7,6 @@ package com.cornucopib.htf.support;
  * @since 2022/4/17
  */
 public enum AuthenticationEnum {
-
     COOKIE,
     SOA;
-
-
 }

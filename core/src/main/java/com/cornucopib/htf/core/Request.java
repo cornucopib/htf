@@ -8,12 +8,12 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * 请求holder.
+ * 请求主持类.
  *
  * @author cornucopib
  * @since 2022/4/17
  */
-public class RequestHolder {
+public class Request {
     private URI uri;
     private String url;
     private Map<String, String> queryParams;
@@ -24,49 +24,49 @@ public class RequestHolder {
     private MultiValueMap<String, String> bodyMap;
     private HttpMethod method;
 
-    public RequestHolder(HttpMethod method, URI uri) {
+    public Request(HttpMethod method, URI uri) {
         this.method = method;
         this.uri = uri;
     }
 
-    public RequestHolder(HttpMethod method, String url) {
+    public Request(HttpMethod method, String url) {
         this.method = method;
         this.url = url;
     }
 
-    public RequestHolder(HttpMethod method, String url, Map<String, String> queryParams) {
+    public Request(HttpMethod method, String url, Map<String, String> queryParams) {
         this(method, url, queryParams, null);
     }
 
-    public RequestHolder(HttpMethod method, String url, Object[] paths) {
+    public Request(HttpMethod method, String url, Object[] paths) {
         this(method, url, null, paths);
     }
 
-    public RequestHolder(HttpMethod method, String url, Map<String, String> queryParams, Object[] paths) {
+    public Request(HttpMethod method, String url, Map<String, String> queryParams, Object[] paths) {
         this.method = method;
         this.url = url;
         this.queryParams = queryParams;
         this.paths = paths;
     }
 
-    public static RequestBuilder method(HttpMethod method, URI uri) {
+    public static  RequestBuilder method(HttpMethod method, URI uri) {
         return new DefaultRequestBuilder(method, uri);
     }
 
-    public static RequestBuilder method(HttpMethod method, String url) {
+    public static  RequestBuilder method(HttpMethod method, String url) {
         return new DefaultRequestBuilder(method, url);
     }
 
-    public static RequestBuilder method(HttpMethod method, String url, Map<String, String> queryParams) {
-        return new DefaultRequestBuilder(method, url,queryParams);
+    public static  RequestBuilder method(HttpMethod method, String url, Map<String, String> queryParams) {
+        return new DefaultRequestBuilder(method, url, queryParams);
     }
 
-    public static RequestBuilder method(HttpMethod method, String url, Object[] paths) {
-        return new DefaultRequestBuilder(method, url,paths);
+    public static  RequestBuilder method(HttpMethod method, String url, Object[] paths) {
+        return new DefaultRequestBuilder(method, url, paths);
     }
 
-    public static RequestBuilder method(HttpMethod method, String url, Map<String, String> queryParams, Object[] paths) {
-        return new DefaultRequestBuilder(method, url,queryParams,paths);
+    public static  RequestBuilder method(HttpMethod method, String url, Map<String, String> queryParams, Object[] paths) {
+        return new DefaultRequestBuilder(method, url, queryParams, paths);
     }
 
     public URI getUri() {

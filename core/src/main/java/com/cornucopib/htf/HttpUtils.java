@@ -1,11 +1,7 @@
 package com.cornucopib.htf;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.cornucopib.htf.core.Htf;
-import com.cornucopib.htf.core.RequestHolder;
+import com.cornucopib.htf.core.Request;
 import com.cornucopib.htf.support.AuthenticationEnum;
-import com.sun.jndi.toolkit.url.Uri;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.springframework.http.*;
@@ -15,12 +11,10 @@ import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.*;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -108,11 +102,11 @@ public class HttpUtils {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Cookie", "123.cn");
-        RequestEntity requestEntity = RequestHolder.method(HttpMethod.GET, "https://tenapi.cn/whois/", params)
+         Request.method(HttpMethod.GET, "https://tenapi.cn/whois/", params)
                 .authentication(AuthenticationEnum.COOKIE)
                 .buildHeader(headers)
-                .build();
-        ResponseEntity<Object> responseEntity = new Htf<Object>().execute(requestEntity, Object.class);
+                .build()
+                .send(Object.class);
     }
 
 

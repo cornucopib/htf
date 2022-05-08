@@ -2,7 +2,7 @@ package com.cornucopib.htf.core;
 
 import com.cornucopib.htf.support.AuthenticationEnum;
 import com.cornucopib.htf.support.AuthenticationStrategy;
-import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
 import java.util.Map;
@@ -14,6 +14,7 @@ import java.util.Map;
 public interface RequestBuilder {
 
     RequestBuilder authentication(AuthenticationEnum authenticationEnum);
+
     RequestBuilder authentication(AuthenticationStrategy authenticationStrategy);
 
     RequestBuilder buildHeader(Map<String, String> headersMap);
@@ -22,6 +23,7 @@ public interface RequestBuilder {
 
     RequestBuilder buildBody(MultiValueMap<String, String> bodyMap);
 
-    RequestEntity build();
+    RequestBuilder build();
 
+     <T> ResponseEntity<T> send(Class<T> responseType);
 }
